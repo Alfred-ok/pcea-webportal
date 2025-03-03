@@ -1,0 +1,27 @@
+.navhover{
+    color: #8a8787;
+}
+.navhover:hover{
+    color: #fff;
+    background-color: rgb(71, 71, 212);
+}
+.nav-icon {
+    font-size: 20px;
+  }
+
+  .nav-link {
+    font-size: 16px;
+    font-weight: normal; 
+  }
+
+  .nav-icon svg {
+    width: 24px;  
+    height: 24px; 
+  }
+
+  .c-sidebar-nav {
+    background-color: gray;
+  }
+  
+  
+  
