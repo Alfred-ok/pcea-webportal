@@ -21,9 +21,12 @@ import {
   CCardTitle,
   CAlert,
   CCardBody,
+  CFormCheck,
 } from "@coreui/react";
 import "ldrs/zoomies";
 import { MdGroupAdd } from "react-icons/md";
+import CV from "./CV";
+import { CSpinner } from '@coreui/react'
 
 const ServiceRequest = () => {
   const [activeTab, setActiveTab] = useState("movedToEvangelist");
@@ -34,6 +37,14 @@ const ServiceRequest = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [comment, setComment] = useState("");
   const [tableRefresh, setTableRefresh ] = useState(true);
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [viewMoreVisible, setViewMoreVisible] = useState(false);
+  const [viewMoreVisibleData, setViewMoreVisibleData] = useState();
+  const [showApproveAllModal, setShowApproveAllModal] = useState(false);
+  const [approveallStatus, setApproveallStatus] = useState("")
+  const [approveallcomments, setApproveallcomments] = useState("")
+  const [loadingApproeallButton, setLoadingApproeallButton] = useState(false);
+
 
   const roleId = localStorage.getItem("roleId");
 
@@ -53,6 +64,7 @@ const ServiceRequest = () => {
 
         const data = await response.json();
         setMembers((prev) => ({ ...prev, [tab]: Array.isArray(data) ? data : [] }));
+        setSelectedMembers([]); // Reset selections on tab change
       } catch (error) {
         console.error(`Error fetching ${tab} members:`, error);
         setMembers((prev) => ({ ...prev, [tab]: [] }));
@@ -61,9 +73,9 @@ const ServiceRequest = () => {
       }
     };
 
-    fetchData("movedToPastoral", "http://197.232.170.121:8594/api/registrations/byStatus?status=4");
-    fetchData("movedToEvangelist", "http://197.232.170.121:8594/api/registrations/byStatus?status=3");
-    fetchData("movedToCatechism", "http://197.232.170.121:8594/api/registrations/byStatus?status=6");
+    fetchData("movedToPastoral", `${import.meta.env.VITE_BASE_URL}/byStatus?status=4`/*"http://197.232.170.121:8594/api/registrations/byStatus?status=4"*/);//4
+    fetchData("movedToEvangelist", `${import.meta.env.VITE_BASE_URL}/byStatus?status=3`/* "http://197.232.170.121:8594/api/registrations/byStatus?status=3"*/);//3
+    fetchData("movedToCatechism", `${import.meta.env.VITE_BASE_URL}/byStatus?status=6`/*"http://197.232.170.121:8594/api/registrations/byStatus?status=6"*/);//6
   }, [tableRefresh]);
 
   const approval = roleId == "1" ? "":"Approval";
@@ -74,6 +86,34 @@ const ServiceRequest = () => {
     movedToCatechism: ["Full Name", "District", "Gender","Telephone", approval],
   };
 
+  // Select/Deselect Individual Member
+  const toggleSelection = (memberId) => {
+    setSelectedMembers((prev) =>
+      prev.includes(memberId) ? prev.filter((id) => id !== memberId) : [...prev, memberId]
+    );
+  };
+
+  // Select/Deselect All Members
+  const toggleSelectAll = () => {
+    if (selectedMembers.length === members[activeTab].length) {
+      setSelectedMembers([]); // Deselect all
+    } else {
+      setSelectedMembers(members[activeTab].map((m) => m.id)); // Select all
+    }
+  };
+
+
+  //viewmore
+  const handleViewMore = (person) =>{
+    if(person){
+      setViewMoreVisibleData(person)
+      setViewMoreVisible(true)
+    }
+    
+  }
+
+  console.log(viewMoreVisibleData);
+
   const handleApprove = (memberId) => {
     const member = members[activeTab].find((m) => m.id === memberId);
     if (member) {
@@ -81,6 +121,8 @@ const ServiceRequest = () => {
       setShowModal(true);
     }
   };
+
+
 
   const handleSubmit = async () => {
     if (!selectedMember || !registrationStatus) {
@@ -98,7 +140,7 @@ const ServiceRequest = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approve", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approve`/*"http://197.232.170.121:8594/api/registrations/approve"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -118,7 +160,70 @@ const ServiceRequest = () => {
     }
   };
 
+
+
+  const handleApproveAll = async () => {
+    if (selectedMembers.length === 0) {
+      alert("No members selected.");
+      return;
+    }
+
+    
+  
+    const approvals = selectedMembers.map((id) => ({
+      id: id,
+      status: approveallStatus, // Change this based on the active tab
+      comments: approveallcomments,
+    }));
+
+    console.log("end",approvals);
+
+    setLoadingApproeallButton(true);
+  
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+  
+      await Promise.all(
+        approvals.map((payload) =>
+          fetch(`${import.meta.env.VITE_BASE_URL}/approve`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          })
+        )
+      );
+      setLoadingApproeallButton(false);
+      setShowApproveAllModal(false)
+      setTableRefresh(!tableRefresh);
+      setSelectedMembers([]); // Reset selection
+
+      alert("All selected members approved!");
+      
+      
+    } catch (error) {
+      console.error("Error approving all:", error);
+      alert("Error approving all. Please try again.");
+      setLoadingApproeallButton(false);
+    }
+  };
+  
+
+
+
+
+
+
+  console.log("start",selectedMembers);
+
+ 
+
   console.log(members);
+
+
   return (
     <CCard className="mb-4">
     <CCardHeader>
@@ -154,18 +259,43 @@ const ServiceRequest = () => {
           <p>Loading data...</p>
         </div>
       ) : (
+        <>
+        {/*approval button*/}
+        {
+          selectedMembers.length !== 0 &&
+          <CButton
+            color="success"
+            style={{ marginBottom: "10px", fontWeight: "bold", color:'#fff', marginTop:"10px" }}
+            onClick={()=>setShowApproveAllModal(true)}
+          >
+            Approve All
+          </CButton>
+        }
+
+
         <CTable striped bordered hover>
+
+        
           <CTableHead>
             <CTableRow color="primary">
+              <CTableHeaderCell style={{ color: "blue", fontWeight: "bold" }}>#</CTableHeaderCell>
               <CTableHeaderCell style={{ color: "blue", fontWeight: "bold" }}>No.</CTableHeaderCell>
               {tableHeaders[activeTab].map((header) => (
                 <CTableHeaderCell key={header} style={{ color: "blue", fontWeight: "bold" }}>{header}</CTableHeaderCell>
               ))}
             </CTableRow>
           </CTableHead>
+
+
           <CTableBody>
             {members[activeTab].map((person, index) => (
               <CTableRow key={person.id}>
+                <CTableDataCell>
+                    <CFormCheck
+                      checked={selectedMembers.includes(person.id)}
+                      onChange={() => toggleSelection(person.id)}
+                    />
+                </CTableDataCell>    
                 <CTableDataCell>{index + 1}</CTableDataCell>
                 <CTableDataCell>{person.names}</CTableDataCell>
                 <CTableDataCell>{person.district}</CTableDataCell>
@@ -179,9 +309,14 @@ const ServiceRequest = () => {
                   { roleId == "1" ?
                     <></>
                     :
-                    <CButton style={{color:"white", fontWeight:"bold"}} color="success" onClick={() => handleApprove(person.id)}>
+                    <>
+                    <CButton style={{color:"white", fontWeight:"bold",marginRight:"5px"}} color="success" onClick={() => handleApprove(person.id)}>
                       Approve
                     </CButton>
+                    <CButton style={{color:"white", fontWeight:"bold"}} color="primary" onClick={() => handleViewMore(person)}>
+                      View More
+                    </CButton>
+                    </>
                     }
                   </CTableDataCell>
                 )}
@@ -189,6 +324,7 @@ const ServiceRequest = () => {
             ))}
           </CTableBody>
         </CTable>
+        </>
       )}
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
   <CModalHeader>
@@ -285,6 +421,113 @@ activeTab === "movedToPastoral" ?
     <CButton color="success" onClick={handleSubmit}>Confirm</CButton>
   </CModalFooter>
 </CModal>
+
+
+    <CModal
+        visible={viewMoreVisible}
+        onClose={() => setViewMoreVisible(false)}
+        aria-labelledby="LiveDemoExampleLabel"
+        size="xl"
+        alignment="center"
+        backdrop="static"
+      >
+      <CModalHeader>
+          
+        </CModalHeader>
+        {viewMoreVisibleData && <CV viewMoreVisibleData={viewMoreVisibleData}/>}
+      
+      </CModal>
+      
+
+
+
+
+
+
+      {/** approve all section */}
+      <CModal visible={showApproveAllModal} onClose={() => setShowApproveAllModal(false)}>
+      <CModalHeader>
+        <CModalTitle>Approval All Details</CModalTitle>
+      </CModalHeader>
+      <CModalBody style={{ maxHeight: "60vh", overflowY: "auto" }}>
+      
+      <>
+
+      <label htmlFor="registrationStatus" className="mt-2" style={{ fontWeight: "bold", color: "blue" }}>
+      Approval All Details
+</label>
+{activeTab === "movedToEvangelist" ?
+        <select
+          id="registrationStatus"
+          className="form-control mt-2"
+          value={approveallStatus}
+          onChange={(e) => setApproveallStatus(e.target.value)}
+        >
+          <option value="">Select</option>
+          
+          <option value={activeTab === "movedToEvangelist" ? "4" : activeTab === "movedToPastoral" ? "5" : "5"}>Moved To Pastoral</option>
+          {
+          //<option value={activeTab === "movedToEvangelist" ? "2" : activeTab === "movedToPastoral" ? "6" : "5"}>Moved Back to Elder </option>
+          }
+        </select>
+:
+activeTab === "movedToPastoral" ?
+          <select
+            id="registrationStatus"
+            className="form-control mt-2"
+            value={approveallStatus}
+            onChange={(e) => setApproveallStatus(e.target.value)}
+          >
+            <option value="">Select</option>
+            
+            <option value={activeTab === "movedToEvangelist" ? "4" : activeTab === "movedToPastoral" ? "5" : "5"}>Move to Full Member awaiting Admission</option>
+            <option value={activeTab === "movedToEvangelist" ? "2" : activeTab === "movedToPastoral" ? "6" : "5"}>Moved To Catechism</option>
+            
+          </select>
+  :
+  activeTab === "movedToCatechism" ?
+          <select
+            id="registrationStatus"
+            className="form-control mt-2"
+            value={approveallStatus}
+            onChange={(e) => setApproveallStatus(e.target.value)}
+          >
+            <option value="">Select</option>
+            
+            <option value={activeTab === "movedToEvangelist" ? "4" : activeTab === "movedToPastoral" ? "5" : "5"}>Move to Full Member awaiting Admission</option>
+            {
+            //<option value={activeTab === "movedToEvangelist" ? "2" : activeTab === "movedToPastoral" ? "6" : "5"}>Moved To Catechism</option>
+            }
+          </select>
+  :
+  <>Action Disabled</>
+  }
+
+        <CFormTextarea
+          className="mt-2"
+          placeholder="Add a comment"
+          value={approveallcomments}
+          onChange={(e) => setApproveallcomments(e.target.value)}
+        />
+      </>
+    
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="secondary" onClick={() => setShowApproveAllModal(false)}>Close</CButton>
+        { loadingApproeallButton ?
+            <CButton color="primary" disabled onClick={handleApproveAll} style={{fontWeight :"bold"}}>
+              <CSpinner as="span" className="me-2" size="sm" aria-hidden="true" />
+              <span>Confirm...</span>
+            </CButton>
+          :
+            <CButton style={{fontWeight :"bold"}} onClick={handleApproveAll} color="primary" type="submit">
+             Confirm
+            </CButton>
+          }
+      </CModalFooter>
+    </CModal>
+
+
     </CCardBody>
     </CCard>
   );

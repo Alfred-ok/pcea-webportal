@@ -38,7 +38,7 @@ const AppSidebar = () => {
       // Optionally send a logout request to the server
       const token = localStorage.getItem("token");
       if (token) {
-        await fetch("http://197.232.170.121:8598/auth/validate", {
+        await fetch(`${import.meta.env.VITE_FOUR_BASE_URL}/auth/validate`/*"http://197.232.170.121:8598/auth/validate"*/, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

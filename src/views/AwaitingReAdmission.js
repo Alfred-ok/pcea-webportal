@@ -53,7 +53,7 @@ function AwaitingReAdmission() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=10", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/RejoiningMemberStatus?Status=10`/*"http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=10"*/, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -142,7 +142,7 @@ function AwaitingReAdmission() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approvetransfer", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approvetransfer`/*"http://197.232.170.121:8594/api/registrations/approvetransfer"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -220,8 +220,8 @@ function AwaitingReAdmission() {
   return (
     <>
       <CCard  className="mb-4">
-        <CCardHeader>
-          <h3 style={{ color: "blue" }}>ReAdmission</h3>
+        <CCardHeader  style={{ backgroundColor: "rgba(22, 89, 177, 0.925)" }}>
+          <h4 style={{ color: "#fff" }}>Awaiting Readmission Confirmation</h4>
         </CCardHeader>
         <CCardBody>
 
@@ -267,10 +267,11 @@ function AwaitingReAdmission() {
                   <CTableRow>
                     <CTableHeaderCell>No.</CTableHeaderCell>
                     <CTableHeaderCell>Full Name</CTableHeaderCell>
-                    <CTableHeaderCell>Mobile Number</CTableHeaderCell>
-                    <CTableHeaderCell>Districts</CTableHeaderCell>
+                    <CTableHeaderCell>District</CTableHeaderCell>
                     <CTableHeaderCell>Gender</CTableHeaderCell>
-                    <CTableHeaderCell>Action</CTableHeaderCell>  
+                    <CTableHeaderCell>ZP Number</CTableHeaderCell>
+                    <CTableHeaderCell>Mobile Number</CTableHeaderCell>
+                    <CTableHeaderCell>Action</CTableHeaderCell>   
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -284,7 +285,7 @@ function AwaitingReAdmission() {
                         <CTableDataCell>{member.mobileNumber}</CTableDataCell>
                      <CTableDataCell>
                         <CButton style={{color:"white", fontWeight:"bold"}}  color="success" onClick={() =>{ handleapproval(member.id);}}>
-                          Admit
+                          Readmit
                         </CButton>
                       </CTableDataCell>
                     </CTableRow>

@@ -24,10 +24,10 @@ const ApprovalTabs = () => {
       </CNav>
       <CTabContent>
         <CTabPane visible={activeTab === 'rejoining'}>
-          <Rejoining apiUrl="http://197.232.170.121:8594/api/registrations/blockedMembers" activeTab={activeTab} />
+          <Rejoining apiUrl={`${import.meta.env.VITE_BASE_URL}/blockedMembers`}/*"http://197.232.170.121:8594/api/registrations/blockedMembers"*/ activeTab={activeTab} />
         </CTabPane>
         <CTabPane visible={activeTab === 'evangelist'}>
-          <Rejoining apiUrl="http://197.232.170.121:8594/api/registrations/elderApproved" activeTab={activeTab} />
+          <Rejoining apiUrl={`${import.meta.env.VITE_BASE_URL}/elderApproved`}/*"http://197.232.170.121:8594/api/registrations/elderApproved"*/ activeTab={activeTab} />
         </CTabPane>
       </CTabContent>
     </>
@@ -93,7 +93,7 @@ const Rejoining = ({ apiUrl, activeTab }) => {
         comments,
       };
   
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approvetransfer", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approvetransfer`/*"http://197.232.170.121:8594/api/registrations/approvetransfer"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

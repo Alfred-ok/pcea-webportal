@@ -15,10 +15,20 @@ import {
   CFormSelect,
   CInputGroup,
   CInputGroupText,
+  CAlert,
 } from "@coreui/react";
 import Districtdata from  "../Registration Form/Districtdata";
+import Zones from "../Registration Form/Zones";
+import { MdPersonAddAlt1 } from "react-icons/md";
+import { CSpinner } from '@coreui/react'
 
 const Kids = () => {
+  const [selectedZone, setSelectedZone] = useState("");
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+
+  const [loadingButton, setLoadingButton] = useState(false);
+
   const [formData, setFormData] = useState({
     gender: "",
     names: "", 
@@ -26,10 +36,11 @@ const Kids = () => {
     disabled: "",
     disabilityType:"",
     email: "",
+    telephone:"",
     guardianPhone: "", 
     yearOfBirth: "", 
     district: "",
-    zone: "",
+    zone: selectedZone,
     age: "",
     baptized: "", 
     communicant: "",
@@ -108,7 +119,58 @@ const Kids = () => {
 
 
 
+  const handleDistrictChange = (event) => {
+    const districtName = event.target.value;
+    setSelectedDistrict(districtName);
+    
+    setFormData((prev) => ({
+      ...prev,
+      district: districtName,
+    }));
 
+    const districtObj = Districtdata.find((d) => d.district === districtName);
+
+    if (districtObj) {
+      const zoneObj = Zones.find((z) => z.zoneId === districtObj.zoneId);
+      const zoneName = zoneObj ? zoneObj.zone : "";
+      setSelectedZone(zoneName);
+  
+      setFormData((prev) => ({
+        ...prev,
+        zone: zoneName,
+      }));
+    } else {
+      setSelectedZone("");
+      setFormData((prev) => ({
+        ...prev,
+        zone: "",
+      }));
+    }
+  };
+
+
+  
+// Filter districts when selectedZone changes
+useEffect(() => {
+  if (selectedZone) {
+    const zoneObj = Zones.find((zone) => zone.zone === selectedZone);
+    const zoneId = zoneObj ? zoneObj.zoneId : null;
+    if (zoneId) {
+      const filtered = Districtdata.filter((district) => district.zoneId === zoneId);
+      setFilteredDistricts(filtered);
+    } else {
+      setFilteredDistricts([]);
+    }
+  } else {
+    setFilteredDistricts(Districtdata); // Reset if no zone selected
+  }
+}, [selectedZone]);
+    
+
+    
+
+  
+ 
 
 
 
@@ -136,7 +198,7 @@ const Kids = () => {
     }
   };
   
-  
+  console.log(formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,9 +218,16 @@ const Kids = () => {
       communionForm: communionForm || null,
       telephone: `+254${formData.guardianPhone}`,
     };
-  
+
+    console.log(dataToSubmit);
+
+    setLoadingButton(true)
+
     try {
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/teenager", {
+      const response = await fetch(
+        //"http://197.232.170.121:8594/api/registrations/teenager", 
+        `${import.meta.env.VITE_BASE_URL}/teenager`,
+        {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -177,6 +246,7 @@ const Kids = () => {
           yearOfBirth: "",
           disabled: "",
           disabilityType:"",
+          telephone:"",
           guardianPhone: "",
           yearOfBirth: "",
           district: "",
@@ -198,15 +268,24 @@ const Kids = () => {
           communionForm: null,
           teenager: "",
         });
+
+        setLoadingButton(false);
       } else {
         const errorResponse = await response.json();
         Swal.fire("Error", errorResponse.message || "Failed to submit registration data.", "error");
+        setLoadingButton(false);
       }
     } catch (error) {
       console.error("Error submitting registration:", error);
       Swal.fire("Error", "Failed to submit registration data. Please try again.", "error");
+      setLoadingButton(false);
     }
   };
+
+
+
+
+
   
   const renderFormInput = (label, name, type = "text", options) => (
     <CCol md="6">
@@ -214,7 +293,7 @@ const Kids = () => {
       {type === "select" && (options || "district") ? (
         <CFormSelect name={name} value={formData[name]} onChange={handleChange} required>
           <option value="">Select {label}</option>
-          {(options || Districtdata).map((opt, idx) => (
+          {(options || filteredDistricts).map((opt, idx) => (
             <option key={idx} value={ opt.district || opt.zoneName || opt.districtName || opt}>
               { opt.district ||opt.zoneName || opt.districtName || opt}
             </option>
@@ -235,7 +314,10 @@ const Kids = () => {
   return (
     <CCard className="mb-4">
       <CCardHeader>
-        <h3 className="text-primary fw-bold">Registration</h3>
+        <CAlert color="primary" variant="solid" style={{display:"flex", alignItems:"center"}}>
+            <MdPersonAddAlt1 style={{marginRight:"8px", fontSize:"40"}} />
+            <h3 className="fw-bold" style={{ color: "#fff" }}>Teenager Registration</h3>
+          </CAlert>
       </CCardHeader>
       <CCardBody>
         <CForm onSubmit={handleSubmit}>
@@ -245,10 +327,25 @@ const Kids = () => {
   {renderFormInput("Gender", "gender", "select", ["Male", "Female"])}
   {renderFormInput("Email", "email")}
 </CRow>
-
 <CRow>
   <CCol md="6">
-    <CFormLabel>Guardian Telephone</CFormLabel>
+    <CFormLabel style={{ fontWeight: "bold", color: "blue" }}>Telephone</CFormLabel>
+    <CInputGroup>
+      <CInputGroupText>+254</CInputGroupText>
+      <CFormInput
+        name="telephone"
+        type="text"
+        value={formData.telephone}
+        onChange={handleChange}
+        maxLength="9"
+        
+      />
+    </CInputGroup>
+  </CCol>
+</CRow>
+<CRow>
+  <CCol md="6">
+    <CFormLabel style={{ fontWeight: "bold", color: "blue" }}>Guardian Telephone</CFormLabel>
     <CInputGroup>
       <CInputGroupText>+254</CInputGroupText>
       <CFormInput
@@ -257,21 +354,37 @@ const Kids = () => {
         value={formData.guardianPhone}
         onChange={handleChange}
         maxLength="9"
-        required
+        
       />
     </CInputGroup>
   </CCol>
   {renderFormInput("Year of Birth", "yearOfBirth", "select", yearOptions)}
 </CRow>
 
+{/* Zone Selector */}
 <CRow>
-  {renderFormInput("District", "district", "select")}
-  {renderFormInput("Zone", "zone")}
+<CCol md="6">
+        <CFormLabel style={{ color: "blue", fontWeight: "bold" }}>* District:</CFormLabel>
+        <CFormSelect value={selectedDistrict} onChange={handleDistrictChange}>
+          <option value="">Select District</option>
+          {Districtdata.map((district) => (
+            <option key={district.id} value={district.district}>
+              {district.district}
+            </option>
+          ))}
+        </CFormSelect>
+      </CCol>
+
+      <CCol md="6">
+        <CFormLabel style={{ fontWeight: "bold", color: "blue" }}>* Zone</CFormLabel>
+        <CFormInput type="text" value={selectedZone} readOnly />
+      </CCol>     
 </CRow>
 
 <CRow>
+  {renderFormInput("Membership Type", "membershipType", "select", ["New","Adherent", "Transfer"])}
   {renderFormInput("Baptized?", "baptized", "select", ["Yes", "No"])}
-  {renderFormInput("Communicant?", "communicant", "select", ["Yes", "No"])}
+  {renderFormInput("Communicant?", "communicant", "select", ["Yes", "No"])}  
 </CRow>
 
 {formData.baptized === "Yes" && (
@@ -295,7 +408,6 @@ const Kids = () => {
 )}
 
 <CRow>
-  {renderFormInput("Membership Type", "membershipType", "select", ["Full", "Transfer"])}
   {renderFormInput("Year of Joining", "yearOfJoining")}
   {renderFormInput("Address", "address")}
 </CRow>
@@ -325,9 +437,16 @@ const Kids = () => {
 </CRow>
 
           <div className="mt-4">
-            <CButton style={{fontWeight :"bold"}} color="primary" type="submit">
-              Register
+          { loadingButton ?
+            <CButton color="primary" disabled style={{fontWeight :"bold"}}>
+              <CSpinner as="span" className="me-2" size="sm" aria-hidden="true" />
+              <span>Register...</span>
             </CButton>
+          :
+            <CButton style={{fontWeight :"bold"}} color="primary" type="submit">
+             Register
+            </CButton>
+          }
           </div>
         </CForm>
       </CCardBody>

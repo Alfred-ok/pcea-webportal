@@ -50,7 +50,7 @@ function holyCommunion() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://197.232.170.121:8594/api/registrations/wrongholycommunionpartakers", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/wrongholycommunionpartakers`/*"http://197.232.170.121:8594/api/registrations/wrongholycommunionpartakers"*/, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -95,16 +95,16 @@ function holyCommunion() {
     let filtered = members;
     if (zp.trim() !== "") {
       filtered = filtered.filter((member) =>
-        member.zpnumber.toLowerCase().includes(zp.toLowerCase())
+        member?.zpnumber?.toLowerCase()?.includes(zp.toLowerCase())
       );
     }
     if (gender) {
       filtered = filtered.filter((member) =>
-        member.gender.toLowerCase() === gender.toLowerCase()
+        member?.gender?.toLowerCase() === gender.toLowerCase()
       );
     }
     if (district) {
-      filtered = filtered.filter((member) => member.district === district);
+      filtered = filtered.filter((member) => member?.district === district);
     }
     setFilteredMembers(filtered);
     setCurrentPage(1);
@@ -137,7 +137,7 @@ function holyCommunion() {
         comments,
       };
   
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approvetransfer", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approvetransfer`/*"http://197.232.170.121:8594/api/registrations/approvetransfer"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

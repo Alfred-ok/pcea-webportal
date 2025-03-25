@@ -4,6 +4,8 @@ import {
   CModalHeader, CModalBody, CModalFooter, CButton, CForm, CFormInput, CFormLabel
 } from '@coreui/react';
 import swal from 'sweetalert';
+import CIcon from '@coreui/icons-react';
+import { cilUser, cilUserPlus } from '@coreui/icons';
 
 const AppHeaderDropdown = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,7 +40,7 @@ const AppHeaderDropdown = () => {
     console.log("Data being sent to API:", formData);
     
     try {
-      const response = await fetch('http://197.232.170.121:8598/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_FOUR_BASE_URL}/auth/register`/*'http://197.232.170.121:8598/auth/register'*/, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -56,7 +58,9 @@ const AppHeaderDropdown = () => {
       <CDropdown>
         <CDropdownToggle className="py-0 pe-0" caret={false}>
           <div style={{ textAlign: 'center' }}>
-            <img src="/src/assets/images/user.png" alt="User" style={{ height: 35, width: 35, borderRadius: '50%', marginBottom: 5 }} />
+            <CIcon icon={cilUser} size="xxl"/>
+            {//<img src="/src/assets/images/user.png" alt="User" style={{ height: 35, width: 35, borderRadius: '50%', marginBottom: 5 }} />
+            }
             <p style={{ fontWeight: 'bold', fontSize: '0.9rem', margin: 0, color: '#333' }}>{loggedUsername}</p>
           </div>
         </CDropdownToggle>

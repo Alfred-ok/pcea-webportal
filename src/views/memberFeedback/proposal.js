@@ -1,5 +1,6 @@
-
 import React, { useEffect, useState } from "react";
+import emailjs from "emailjs-com";
+import Swal from 'sweetalert2'
 import {
   CCard,
   CCardHeader,
@@ -12,13 +13,28 @@ import {
   CTableDataCell,
   CSpinner,
   CAlert,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CButton,
+  CForm,
+  CFormLabel,
+  CFormInput,
+  CFormTextarea,
 } from "@coreui/react";
 
 function Proposal() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [showModal, setShowModal] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [nameEmail, setNameEmail] = useState("")
+  const[showMessage, setShowMessage] = useState("");
+  const[showMessageModal, setShowMessageModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +43,7 @@ function Proposal() {
         if (!token) throw new Error("Authentication token not found");
 
         const response = await fetch(
-          "http://197.232.170.121:8594/api/registrations/getMemberFeedback?feedbackType=Proposal",
+          `${import.meta.env.VITE_BASE_URL}/getMemberFeedback?feedbackType=Proposal`,
           {
             method: "GET",
             headers: {
@@ -54,9 +70,54 @@ function Proposal() {
     fetchData();
   }, []);
 
+
+
+  const handleOpenModal = (member) => {
+    setSelectedEmail(member.email);
+    setNameEmail(member.name)
+    setShowModal(true);
+    console.log(member.email);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedEmail("");
+    setEmailBody("");
+  };
+
+  const handleSendEmail = () => {
+
+    const templateParams = {
+      email: selectedEmail,
+      subject: "Proposal Response",
+      message: `Hello ${nameEmail},\n\n ${emailBody}`
+    };
+    emailjs
+      .send("service_v2vm3zj", "template_buj7p5i", templateParams, "8Tn-sABtVH3vPgLtE")
+      .then(() => {
+       // alert("Email sent successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Email sent successfully",
+          text: "Successfully",
+        })
+        setShowModal(false);
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+        //alert("Failed to send email.");
+        Swal.fire({
+          icon: "error",
+          title: "Failed to send email.",
+          text: "Failed",
+        });
+        setShowModal(false);
+      });
+  }
+
   return (
     <CCard className="mb-4">
-      <CCardHeader style={{ backgroundColor:"rgba(22, 89, 177, 0.925)" }}>
+      <CCardHeader style={{ backgroundColor: "rgba(22, 89, 177, 0.925)" }}>
         <h3 style={{ color: "#fff" }}>Proposals</h3>
       </CCardHeader>
       <CCardBody>
@@ -71,14 +132,16 @@ function Proposal() {
           <p>No records found.</p>
         ) : (
           <CTable striped bordered hover>
-            <CTableHead>
+            <CTableHead color="primary">
               <CTableRow>
                 <CTableHeaderCell>#</CTableHeaderCell>
                 <CTableHeaderCell>Name</CTableHeaderCell>
-                <CTableHeaderCell>Message</CTableHeaderCell>
-                <CTableHeaderCell>Feed back Type</CTableHeaderCell>
+                <CTableHeaderCell><span style={{fontSize:"12px"}}><i>(Click for more message)</i></span> <br/> Message </CTableHeaderCell>
+                <CTableHeaderCell>Feedback Type</CTableHeaderCell>
+                <CTableHeaderCell>Email</CTableHeaderCell>
                 <CTableHeaderCell>ZpNumber</CTableHeaderCell>
-                <CTableHeaderCell>Date</CTableHeaderCell>
+                <CTableHeaderCell>Posted Date</CTableHeaderCell>
+                <CTableHeaderCell>Action</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -86,16 +149,83 @@ function Proposal() {
                 <CTableRow key={index}>
                   <CTableDataCell>{index + 1}</CTableDataCell>
                   <CTableDataCell>{member.name}</CTableDataCell>
-                  <CTableDataCell>{member.message}</CTableDataCell>
+                  <CTableDataCell onClick={()=>{setShowMessageModal(true); setShowMessage(member.message)}}>{member.message.slice(0, 30) + "..."}</CTableDataCell>
                   <CTableDataCell>{member.FeedbackType}</CTableDataCell>
-                  <CTableDataCell>{member.ZPNumber}</CTableDataCell>
+                  <CTableDataCell>{member.email}</CTableDataCell>
+                  <CTableDataCell>{member.ZpNumber}</CTableDataCell>
                   <CTableDataCell>{member.createdAt}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton color="primary" size="sm" onClick={() => handleOpenModal(member)}>
+                      Send Email
+                    </CButton>
+                  </CTableDataCell>
                 </CTableRow>
               ))}
             </CTableBody>
           </CTable>
         )}
       </CCardBody>
+
+      {/* Email Sending Modal */}
+      <CModal visible={showModal} onClose={handleCloseModal}>
+        <CModalHeader closeButton>
+          <CModalTitle>Send Email</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <CForm>
+            {/*
+            <div className="mb-3">
+              <CFormLabel>Email</CFormLabel>
+              <CFormInput type="email" value={selectedEmail} disabled />
+            </div>
+            */}
+            <div className="mb-3">
+              {`Hello ${nameEmail},`}
+            </div>
+            <div className="mb-3">
+              {/*<CFormLabel>Message</CFormLabel>*/}
+              <CFormTextarea
+                rows="4"
+                value={emailBody}
+                onChange={(e) => setEmailBody(e.target.value)}
+                placeholder="Enter your message..."
+              />
+            </div>
+          </CForm>
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={handleCloseModal}>
+            Close
+          </CButton>
+          <CButton color="primary" onClick={handleSendEmail}>
+            Send
+          </CButton>
+        </CModalFooter>
+      </CModal>
+
+
+
+
+
+      <CModal
+        alignment="center"
+        visible={showMessageModal}
+        onClose={() => setShowMessageModal(false)}
+        aria-labelledby="VerticallyCenteredExample"
+      >
+        <CModalHeader>
+          <CModalTitle id="VerticallyCenteredExample">Message</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          {showMessage}
+        </CModalBody>
+        <CModalFooter>
+          <CButton color="secondary" onClick={() => setShowMessageModal(false)}>
+            Close
+          </CButton>
+        </CModalFooter>
+      </CModal>
+      
     </CCard>
   );
 }

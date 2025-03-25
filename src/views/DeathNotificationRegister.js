@@ -44,7 +44,9 @@ const DeathNotificationRegister = () => {
 
     try {
       const response = await fetch(
-        "http://197.232.170.121:8594/api/registrations/DeathNotification",
+        
+        //"http://197.232.170.121:8594/api/registrations/DeathNotification",
+        `${import.meta.env.VITE_BASE_URL}/DeathNotification`,
         {
           method: "POST",
           headers: {

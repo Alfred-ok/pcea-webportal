@@ -8,7 +8,8 @@ const DeathNotification = () => {
 
   useEffect(() => {
     fetch(
-      "http://197.232.170.121:8594/api/registrations/getDeathNotification?ZpNumber=ZP123456"
+      //"http://197.232.170.121:8594/api/registrations/getallDeathNotification"
+      `${import.meta.env.VITE_BASE_URL}/getallDeathNotification`
     )
       .then((response) => response.json())
       .then((data) => setData(data))
@@ -27,10 +28,11 @@ const DeathNotification = () => {
             <CAlert color="primary" variant="solid" style={{ display: "flex", justifyContent:"space-between"}}>
             <div style={{display:"flex"}}>
               <MdReceiptLong className="nav-icon" size={40} />
-              {
-             // <h3 style={{ marginLeft: '10px' }}>Death Notification Records</h3>
-              }
+            
+             <h3 style={{ marginLeft: '10px' }}>Death Notification Records</h3>
             </div>
+            {
+              /*
             <div>
               <CButton color="light" variant="outline" onClick={()=>navigate("/DeathNotificationRegister")} style={{display:"flex", justifyContent:"center", alignItems:"center"}}>
               <svg style={{marginRight:"8px"}} xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
@@ -39,7 +41,9 @@ const DeathNotification = () => {
               </svg>
                 Death Register
               </CButton>
-            </div>    
+            </div>
+            */
+            }    
             </CAlert>
           </CCardTitle>
      <CTable striped bordered hover >

@@ -46,7 +46,7 @@ const EmployeeRegistration = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch("http://197.232.170.121:8595/api/employee/save", {
+      const response = await fetch(`${import.meta.env.VITE_SECOND_BASE_URL}/api/employee/save`/*"http://197.232.170.121:8595/api/employee/save"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +120,7 @@ const EmployeeRegistration = () => {
                 <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
                 <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
               </svg>
-              <h3>Registration Form</h3>
+              <h3>Employee Registration Form</h3>
             </CAlert>
           </CCardTitle>
           <CForm onSubmit={handleSubmit}>
@@ -248,8 +248,12 @@ const EmployeeRegistration = () => {
                       }}><CIcon icon={cilTask} /></CInputGroupText>
                 <CFormSelect name="jobType" value={formData.jobType} onChange={handleChange} style={{ borderColor: "blue" }}>
                     <option>Job Type</option>
-                    <option value="Part-time">Part-Time</option>
-                    <option value="Full-time">Full-Time</option>
+                    <option value="Permanent">Permanent</option>
+                    <option value="Intern">Intern</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Casuals">Casuals</option>
+                    <option value="Employment Contract">Employment Contract</option>
+                    <option value="Service Contract">Service Contract</option>
                 </CFormSelect>
                 </CInputGroup>
               </CCol>

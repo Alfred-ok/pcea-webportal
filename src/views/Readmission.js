@@ -25,6 +25,7 @@ import {
 } from "@coreui/react";
 import "ldrs/zoomies";
 import { MdGroupAdd } from "react-icons/md";
+import ViewMore from "./ViewMore";
 
 const Readmission = () => {
   const [activeTab, setActiveTab] = useState("movedToEvangelist");
@@ -35,6 +36,8 @@ const Readmission = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [comment, setComment] = useState("");
   const [tableRefresh, setTableRefresh ] = useState(true);
+  const [viewMoreVisible, setViewMoreVisible] = useState(false);
+  const [viewMoreVisibleData, setViewMoreVisibleData] = useState();
 
   const roleId = localStorage.getItem("roleId");
 
@@ -62,9 +65,9 @@ const Readmission = () => {
       }
     };
 
-    fetchData("movedToPastoral", "http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=8");
-    fetchData("movedToEvangelist", "http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=13"); //previous 7
-    fetchData("movedToCatechism", "http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=9");
+    fetchData("movedToPastoral", `${import.meta.env.VITE_BASE_URL}/RejoiningMemberStatus?Status=8`/*"http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=8"*/);
+    fetchData("movedToEvangelist", `${import.meta.env.VITE_BASE_URL}/RejoiningMemberStatus?Status=13` /*"http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=13"*/); //previous 7
+    fetchData("movedToCatechism", `${import.meta.env.VITE_BASE_URL}/RejoiningMemberStatus?Status=9`/*"http://197.232.170.121:8594/api/registrations/RejoiningMemberStatus?Status=9"*/);
   }, [tableRefresh]);
 
   const approval = roleId == "1" ? "":"Approval";
@@ -74,6 +77,17 @@ const Readmission = () => {
     movedToEvangelist: ["Full Name", "District", "Gender", "ZpNumber", "Telephone", approval],
     movedToCatechism: ["Full Name", "District", "Gender", "ZpNumber","Telephone", approval],
   };
+
+
+   //viewmore
+   const handleViewMore = (person) =>{
+    if(person){
+      setViewMoreVisibleData(person)
+      setViewMoreVisible(true)
+    }
+    
+  }
+
 
   const handleApprove = (memberId) => {
     const member = members[activeTab].find((m) => m.id === memberId);
@@ -101,7 +115,7 @@ const Readmission = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approvetransfer", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approvetransfer`/*"http://197.232.170.121:8594/api/registrations/approvetransfer"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,9 +196,14 @@ const Readmission = () => {
                   { roleId == "1" ?
                     <></>
                     :
-                    <CButton style={{color:"white", fontWeight:"bold"}} color="success" onClick={() => handleApprove(person.id)}>
+                    <>
+                    <CButton style={{color:"white", fontWeight:"bold" ,marginRight:"5px"}} color="success" onClick={() => handleApprove(person.id)}>
                       Approve
                     </CButton>
+                    <CButton style={{color:"white", fontWeight:"bold"}} color="primary" onClick={() => handleViewMore(person)}>
+                      View More
+                    </CButton>
+                    </>
                     }
                   </CTableDataCell>
                 )}
@@ -193,6 +212,32 @@ const Readmission = () => {
           </CTableBody>
         </CTable>
       )}
+
+
+
+
+      <CModal
+        visible={viewMoreVisible}
+        onClose={() => setViewMoreVisible(false)}
+        aria-labelledby="LiveDemoExampleLabel"
+        size="xl"
+        alignment="center"
+        backdrop="static"
+      >
+      <CModalHeader>
+          
+        </CModalHeader>
+        {viewMoreVisibleData && <ViewMore viewMoreVisibleData={viewMoreVisibleData}/>}
+      
+      </CModal>
+
+
+
+
+
+
+
+
       <CModal visible={showModal} onClose={() => setShowModal(false)}>
   <CModalHeader>
     <CModalTitle>Approval Details</CModalTitle>

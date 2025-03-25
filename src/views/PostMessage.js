@@ -1,13 +1,17 @@
 
 
 import React, { useState } from "react";
-import { CButton, CCard, CCardBody, CCardTitle, CForm, CFormInput, CFormSelect, CAlert } from "@coreui/react";
+import { CButton, CCard, CCardBody, CCardTitle, CForm, CFormInput, CFormSelect, CAlert, CFormTextarea } from "@coreui/react";
+import { useNavigate } from "react-router-dom";
+import CIcon from "@coreui/icons-react";
+import { cilArrowThickLeft } from "@coreui/icons";
 
 const PostMessage = () => {
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("Congrats");
+  const [messageType, setMessageType] = useState("");
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,11 +20,11 @@ const PostMessage = () => {
 
     const payload = {
       Message: message,
-      MessageType: messageType,
+      MessagesType: messageType,
     };
 
     try {
-      const res = await fetch("http://197.232.170.121:8594/api/registrations/PostMessages", {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL}/PostMessages`/*"http://197.232.170.121:8594/api/registrations/PostMessages"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +36,9 @@ const PostMessage = () => {
       const data = await res.json();
       setResponse("Message sent successfully!");
       setMessage("");
-      setMessageType("Congrats");
+      setMessageType("");
+      console.log(data);
+      navigate('/messages')
     } catch (err) {
       setError(err.message);
     }
@@ -42,6 +48,9 @@ const PostMessage = () => {
     <div className="p-4">
       <CCard className="mb-4">
         <CCardBody>
+          <CCardTitle className="mb-3">
+            <CButton onClick={()=>navigate(-1)} color="primary" variant="outline"><CIcon icon={cilArrowThickLeft} style={{marginRight:"6px"}} />Back</CButton>
+          </CCardTitle>
           <CCardTitle>
             <CAlert color="primary" variant="solid">
               <h3>Send a Message</h3>
@@ -50,8 +59,8 @@ const PostMessage = () => {
           {response && <CAlert color="success">{response}</CAlert>}
           {error && <CAlert color="danger">{error}</CAlert>}
           <CForm onSubmit={handleSubmit}>
-            <CFormInput
-              type="text"
+            <CFormTextarea
+              rows={3}
               label="Message"
               placeholder="Enter your message"
               value={message}
@@ -63,11 +72,10 @@ const PostMessage = () => {
               value={messageType}
               onChange={(e) => setMessageType(e.target.value)}
             >
-              <option value="Congrats">Congrats</option>
-              <option value="SpecialService">Special Service</option>
-              <option value="HolyCommunion">Holy Communion</option>
-              <option value="FirstService">First Service</option>
-              <option value="SecondService">Second Service</option>
+              <option value="Special Service">Special Service</option>
+              <option value="Holy Communion">Holy Communion</option>
+              <option value="First Service">First Service</option>
+              <option value="Second Service">Second Service</option>
             </CFormSelect>
             <CButton type="submit" color="primary" className="mt-3">
               Send Message

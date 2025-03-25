@@ -111,7 +111,7 @@ const Barred = React.lazy(() => import("./views/Barred"));
 
 //Reports
 
-const Reports = React.lazy(() => import("./views/Reports"));
+const Reports = React.lazy(() => import("./views/Reports/Reports"));
 
 //Employees
 
@@ -152,6 +152,24 @@ const Messages = React.lazy(()=>import("./views/Messages"))
 
 const PostMessages = React.lazy(()=>import("./views/PostMessage"))
 
+const MemberInformation = React.lazy(()=>import("./views/MemberInformation"))
+
+const AwaitingBaptism = React.lazy(()=>import("./views/AwaitingBaptism"))
+
+const AddMember = React.lazy(()=>import("./views/AddMember"))
+
+const ScheduleMeeting = React.lazy(()=>import("./views/ScheduleMeeting"))
+
+const Minister = React.lazy(()=>import("./views/Minister"))
+
+const AddMinister = React.lazy(()=>import("./views/AddMinister"))
+
+const CardNumberUpdate = React.lazy(()=>import("./views/CardNumberUpdate"))
+
+const Appointments = React.lazy(()=>import("./views/Appointments"))
+
+const EvangelistAppointment = React.lazy(()=>import("./views/EvangelistAppointment/EvangelistAppointment"))
+
 const routes = [
   { path: "/", exact: true, name: "Home" },
   { path: "/dashboard", name: "Dashboard", element: Dashboard },
@@ -182,6 +200,18 @@ const routes = [
 
   { path:"/MemberFeedBack", name:"memberFeedBack", element: memberFeedBack },
 
+  { path:"/MemberInformation", name:"MemberInformation", element: MemberInformation },
+
+  { path:"/AwaitingBaptism", name:"AwaitingBaptism", element: AwaitingBaptism },
+
+  //Minister
+  { path:"/Minister", name:"Minister", element: Minister },
+  { path:"/AddMinister", name:"AddMinister", element: AddMinister },
+  { path:"/CardNumberUpdate", name:"CardNumberUpdate", element: CardNumberUpdate },
+  { path:"/Appointments", name:"Appointments", element: Appointments },
+  
+  
+
   {
     path: "/RegistrationForm",
     name: "Registration Form",
@@ -194,6 +224,12 @@ const routes = [
   {path:"/DeathNotificationRegister", name: "DeathNotificationRegister", element: DeathNotificationRegister},
   {path:"/EmployeeRegistration",name:"EmployeeRegistration", element: EmployeeRegistration},
   {path:"/Attendance",name:"Attendance", element: Attendance},
+
+  {path:"/AddMember",name:"AddMember", element: AddMember}, 
+
+  {path:"/ScheduleMeeting",name:"ScheduleMeeting", element: ScheduleMeeting}, 
+
+  {path: "/EvangelistAppointment", name: "EvangelistAppointment", element: EvangelistAppointment },
 
   { path: "/theme", name: "Theme", element: Colors, exact: true },
   { path: "/theme/colors", name: "Colors", element: Colors },

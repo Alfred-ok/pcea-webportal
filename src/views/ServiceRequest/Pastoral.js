@@ -17,7 +17,7 @@ import Prayer from './service/Prayer';
 
 const Pastoral = () => {
 
-  const ChangeStatus = 1;
+  const ChangeStatus = 2;
  
   const [activeTab, setActiveTab] = useState('baptism');
   return (

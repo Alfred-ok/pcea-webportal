@@ -19,11 +19,11 @@ FROM nginx:stable-alpine
 # Copy the custom Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the built files to the Nginx HTML directory
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy the built files to the Nginx HTML directory (Make sure it's 'build/' or 'dist/')
+COPY --from=builder /app/build /usr/share/nginx/html
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8040
+EXPOSE 8040
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

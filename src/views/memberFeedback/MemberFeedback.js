@@ -13,7 +13,7 @@ function MemberFeedback() {
     </CAlert>
     <CTabs activeItemKey="Remarks">
       <CTabList variant="tabs">
-        <CTab itemKey="Remarks">Remarks</CTab>
+        <CTab itemKey="Remarks">Compliments</CTab>
         <CTab itemKey="Proposal">Proposal</CTab>
         <CTab itemKey="Complains">Complains</CTab>
       </CTabList>

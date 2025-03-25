@@ -22,10 +22,10 @@ const Parish = () => {
       </CNav>
       <CTabContent>
         <CTabPane visible={activeTab === 'rejoining'}>
-          <Rejoining apiUrl="http://197.232.170.121:8594/api/registrations/getmembertansfer?status=2" activeTab={activeTab} />
+          <Rejoining apiUrl= {`${import.meta.env.VITE_BASE_URL}/getmembertansfer?status=2`}/*"http://197.232.170.121:8594/api/registrations/getmembertansfer?status=2"*/ activeTab={activeTab} />
         </CTabPane>
         <CTabPane visible={activeTab === 'evangelist'}>
-          <Rejoining apiUrl="http://197.232.170.121:8594/api/registrations/elderApproved" activeTab={activeTab} />
+          <Rejoining apiUrl={`${import.meta.env.VITE_BASE_URL}/elderApproved`}/*"http://197.232.170.121:8594/api/registrations/elderApproved"*/ activeTab={activeTab} />
         </CTabPane>
       </CTabContent>
     </>
@@ -92,7 +92,7 @@ const Rejoining = ({ apiUrl, activeTab }) => {
         comments,
       };
   
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approvetransfer", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approvetransfer`/*"http://197.232.170.121:8594/api/registrations/approvetransfer"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +127,7 @@ const Rejoining = ({ apiUrl, activeTab }) => {
     <>
       <CCard className="mb-4">
         <CCardHeader>
-          <h3 style={{ color: "blue", fontWeight:"bold"}}>Welcome Back!</h3>
+          <h3 style={{ color: "blue", fontWeight:"bold"}}>Member Transfer</h3>
         </CCardHeader>
         <CCardBody>
           {loading ? (

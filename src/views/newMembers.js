@@ -51,7 +51,7 @@ function newMembers() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://197.232.170.121:8594/api/registrations/newlyregistered", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/newlyregistered`/*"http://197.232.170.121:8594/api/registrations/newlyregistered"*/, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -140,7 +140,7 @@ function newMembers() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approve", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approve`/*"http://197.232.170.121:8594/api/registrations/approve"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -217,8 +217,8 @@ function newMembers() {
   return (
     <>
       <CCard  className="mb-4">
-        <CCardHeader>
-          <h3 style={{ color: "blue" }}>Admission</h3>
+        <CCardHeader style={{ backgroundColor: "rgba(22, 89, 177, 0.925)" }}>
+          <h4 style={{ color: "#fff" }}>Awaiting Admission Confirmation</h4>
         </CCardHeader>
         <CCardBody>
 

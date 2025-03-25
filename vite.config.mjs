@@ -43,6 +43,8 @@ export default defineConfig(() => {
       port: 3000,
       proxy: {
         // https://vitejs.dev/config/server-options.html
+        target: '*',
+        changeOrigin: true,
       },
     },
   }

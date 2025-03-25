@@ -17,7 +17,7 @@ import Prayer from './service/Prayer';
 
 const Catechism = () => {
 
-  const ChangeStatus = 2;
+  const ChangeStatus = 3;
  
   const [activeTab, setActiveTab] = useState('baptism');
   return (
@@ -35,3 +35,4 @@ const Catechism = () => {
 };
 
 export default Catechism;
+

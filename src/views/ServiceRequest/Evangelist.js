@@ -16,7 +16,7 @@ import Baptism from './service/Baptism';
 
 const Evangelist = () => {
 
-  const ChangeStatus = 0;
+  const ChangeStatus = 1;
  
   const [activeTab, setActiveTab] = useState('baptism');
   return (

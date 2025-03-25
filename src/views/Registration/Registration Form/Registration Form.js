@@ -17,9 +17,18 @@ import {
   CAlert,
 } from "@coreui/react";
 import Districtdata from  "./Districtdata";
+import Zones from "./Zones";
 import { MdPersonAddAlt1 } from "react-icons/md";
+import { CSpinner } from '@coreui/react'
 
 const RegistrationForm = () => {
+  const [filteredDistricts, setFilteredDistricts] = useState([]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedZone, setSelectedZone] = useState("");
+
+  const [loadingButton, setLoadingButton] = useState(false);
+
+
   const [formData, setFormData] = useState({
     telephone: "",
     disabled: "",
@@ -41,8 +50,8 @@ const RegistrationForm = () => {
     confirmedBy: "",
     confirmationLocation: "",
     yearOfJoining: "",
-    district: "",
-    zone: "",
+    district: selectedDistrict,
+    zone: selectedZone,
     address: "",
     teenager: "",
     guardianPhone: null,
@@ -59,6 +68,11 @@ const RegistrationForm = () => {
     { name: "", age: "", baptized: "No", confirmed: "No" },
   ]);
 
+  
+  
+
+
+  
 
   
 
@@ -112,8 +126,54 @@ const RegistrationForm = () => {
     generateYears();
   }, []);
 
+
+  const handleDistrictChange = (event) => {
+    const districtName = event.target.value;
+    setSelectedDistrict(districtName);
+    
+    setFormData((prev) => ({
+      ...prev,
+      district: districtName,
+    }));
+
+    const districtObj = Districtdata.find((d) => d.district === districtName);
+
+    if (districtObj) {
+      const zoneObj = Zones.find((z) => z.zoneId === districtObj.zoneId);
+      const zoneName = zoneObj ? zoneObj.zone : "";
+      setSelectedZone(zoneName);
+  
+      setFormData((prev) => ({
+        ...prev,
+        zone: zoneName,
+      }));
+    } else {
+      setSelectedZone("");
+      setFormData((prev) => ({
+        ...prev,
+        zone: "",
+      }));
+    }
+  };
+  
   
  
+// Filter districts when selectedZone changes
+useEffect(() => {
+  if (selectedZone) {
+    const zoneObj = Zones.find((zone) => zone.zone === selectedZone);
+    const zoneId = zoneObj ? zoneObj.zoneId : null;
+    if (zoneId) {
+      const filtered = Districtdata.filter((district) => district.zoneId === zoneId);
+      setFilteredDistricts(filtered);
+    } else {
+      setFilteredDistricts([]);
+    }
+  } else {
+    setFilteredDistricts(Districtdata); // Reset if no zone selected
+  }
+}, [selectedZone]);
+    
 
 
 
@@ -123,10 +183,11 @@ const RegistrationForm = () => {
 
 
 
+  console.log(selectedZone);
+  console.log(formData.district);
 
-
-
-
+  console.log(selectedDistrict);
+  console.log(selectedZone);
 
 
   const handleChange = ({ target: { name, value, type, checked } }) => {
@@ -181,9 +242,14 @@ const RegistrationForm = () => {
     };
   
     console.log("Submitting Data:", JSON.stringify(dataToSubmit, null, 2)); // Debugging
+
+    setLoadingButton(true)
   
     try {
-      const response = await fetch("http://197.232.170.121:8594/api/registrations", {
+      const response = await fetch(
+        //"http://197.232.170.121:8594/api/registrations"
+        `${import.meta.env.VITE_BASE_URL}`
+        , {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +257,7 @@ const RegistrationForm = () => {
         },
         body: JSON.stringify(dataToSubmit),
       });
-  
+      console.log(response);
       if (response.ok) {
         Swal.fire("Success!", "Registration data submitted successfully.", "success");
         setFormData({
@@ -226,13 +292,19 @@ const RegistrationForm = () => {
           children: [],
         });
         setChildData([{ name: "", age: "", baptized: "", confirmed: "",disabled:"", disabilityType:"" }]);
+
+        setLoadingButton(false);
       } else {
         const errorResponse = await response.json();
+        setLoadingButton(false);
+
         Swal.fire("Error", errorResponse.message || "Failed to submit registration data.", "error");
       }
     } catch (error) {
       console.error("Error submitting registration:", error);
       Swal.fire("Error", "Failed to submit registration data. Please try again.", "error");
+
+      setLoadingButton(false);
     }
   };
   
@@ -241,9 +313,9 @@ const RegistrationForm = () => {
     <CCol md="6">
       <CFormLabel style={{ fontWeight: "bold", color: "blue" }}>{label}</CFormLabel>
       {type === "select" && (options || "district") ? ( 
-        <CFormSelect name={name} value={formData[name]} onChange={handleChange} required> 
+        <CFormSelect name={name} value={formData[name]} onChange={handleChange} > 
           <option value="">Select {label}</option>
-          {(options || Districtdata).map((opt, idx) => (
+          {(options || filteredDistricts).map((opt, idx) => (
             <option key={idx} value={ opt.district || opt.zoneName || opt.districtName || opt}>
               { opt.district || opt.zoneName || opt.districtName || opt}
             </option>
@@ -266,7 +338,7 @@ const RegistrationForm = () => {
       <CCardHeader className="mt-2">
         <CAlert color="primary" variant="solid" style={{display:"flex", alignItems:"center"}}>
             <MdPersonAddAlt1 style={{marginRight:"8px", fontSize:"40"}} />
-            <h3 className="fw-bold" style={{ color: "#fff" }}>Adherent Member Registration</h3>
+            <h3 className="fw-bold" style={{ color: "#fff" }}>Member Registration</h3>
           </CAlert>
       </CCardHeader>
       <CCardBody>
@@ -281,7 +353,7 @@ const RegistrationForm = () => {
 
           <CRow>
             <CCol md="6">
-              <CFormLabel>*Telephone</CFormLabel>
+              <CFormLabel style={{color:"blue", fontWeight:700}}>*Telephone</CFormLabel>
               <CInputGroup>
                 <CInputGroupText>+254</CInputGroupText>
                 <CFormInput
@@ -298,9 +370,29 @@ const RegistrationForm = () => {
           </CRow>
           <CRow>
             {// renderFormInput("District", "district", "select", districts)
-              renderFormInput("*District", "district", "select")
+             // renderFormInput("*District", "district", "select")
             }
-            {renderFormInput("*Zone", "zone")}
+
+           {//renderFormInput("*Zone", "zone")
+           }
+           {/* Zone Selector */}
+           <CCol md="6">
+              <CFormLabel style={{ color: "blue", fontWeight: "bold" }}>* District:</CFormLabel>
+              <CFormSelect value={selectedDistrict} onChange={handleDistrictChange}>
+                <option value="">Select District</option>
+                {Districtdata.map((district) => (
+                  <option key={district.id} value={district.district}>
+                    {district.district}
+                  </option>
+                ))}
+              </CFormSelect>
+            </CCol>
+
+            <CCol md="6">
+              <CFormLabel style={{ fontWeight: "bold", color: "blue" }}>* Zone</CFormLabel>
+              <CFormInput type="text" value={selectedZone} readOnly />
+            </CCol>
+          
           </CRow>
           <CRow>
   {renderFormInput("*Marital Status", "maritalStatus", "select", [
@@ -308,13 +400,15 @@ const RegistrationForm = () => {
     "Single",
     "Widow",
     "Widower",
+    "Divorced"
   ])}
   
   {formData.maritalStatus === "Married" && (
     <>
-      {renderFormInput("Marriage Type", "marriageType", "select", ["Christian", "Others"])}
+      {renderFormInput("Marriage Type", "marriageType", "select", ["Christian","Customary", "Civil", "Others"])}
       
       {renderFormInput("Spouse Name", "spouseName")}
+
       {renderFormInput("Spouse ZP", "spouseZP")}
     </>
   )}
@@ -322,6 +416,7 @@ const RegistrationForm = () => {
 </CRow>
 
           <CRow>
+          {renderFormInput("*Membership Type", "membershipType", "select", ["New","Adherent", "Transfer"])}
             {renderFormInput("*Baptized?", "baptized", "select", ["Yes", "No"])}
             {formData.baptized === "Yes" && renderFormInput("Communicant?", "communicant", "select", ["Yes", "No"])}
           </CRow>
@@ -348,7 +443,7 @@ const RegistrationForm = () => {
 )}
         
         <CRow>
-  {renderFormInput("*Membership Type", "membershipType", "select", ["Full", "Transfer"])}
+  
   {renderFormInput("*Year of Joining", "yearOfJoining")}
   {renderFormInput("*Address", "address")}
 </CRow>
@@ -438,6 +533,7 @@ const RegistrationForm = () => {
                       onChange={(e) => handleChildChange(index, "confirmed", e.target.value)}
                     >
                       <option value="Yes">Yes</option>
+                      <option value="No">No</option>
                       {
                         //<option value="No">No</option>
                       }
@@ -495,9 +591,16 @@ const RegistrationForm = () => {
           )}
 
           <div className="mt-4">
-            <CButton style={{fontWeight :"bold"}} color="primary" type="submit">
-              Register
+          { loadingButton ?
+            <CButton color="primary" disabled style={{fontWeight :"bold"}}>
+              <CSpinner as="span" className="me-2" size="sm" aria-hidden="true" />
+              <span>Register...</span>
             </CButton>
+          :
+            <CButton style={{fontWeight :"bold"}} color="primary" type="submit">
+             Register
+            </CButton>
+          }
           </div>
         </CForm>
       </CCardBody>

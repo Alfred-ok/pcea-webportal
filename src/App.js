@@ -19,6 +19,9 @@ const ChildrenBelow = React.lazy(() => import("./views/Registration/Kids/Childre
 
 import { MembersProvider } from "./views/MembersContext"; 
 
+import { ScheduleProvider } from "./views/ScheduleContext";
+
+
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token"); 
@@ -50,6 +53,7 @@ const App = () => {
   return (
    
     <MembersProvider>
+      <ScheduleProvider>
       <BrowserRouter>
         <Suspense
           fallback={
@@ -90,6 +94,7 @@ const App = () => {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </ScheduleProvider>
     </MembersProvider>
   );
 };

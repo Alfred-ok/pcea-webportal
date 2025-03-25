@@ -232,15 +232,18 @@ const Messages = () => {
   const [messageType, setMessageType] = useState("specialservice");
   const [showModal, setShowModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [tableRefresh, setTableRefresh] = useState(true);
   
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://197.232.170.121:8594/api/registrations/getmessages?MessageType=${messageType}`)
+    fetch(`${import.meta.env.VITE_BASE_URL}/getmessages?MessageType=${messageType}`,/*`http://197.232.170.121:8594/api/registrations/getmessages?MessageType=${messageType}`*/)
       .then((response) => response.json())
       .then((data) => setData(data))
       .catch((error) => console.error("Error fetching data:", error));
-  }, [messageType]);
+  }, [messageType, tableRefresh]);
+
+  console.log(data)
 
   const handleEdit = (message) => {
     setSelectedMessage(message);
@@ -250,33 +253,36 @@ const Messages = () => {
   const handleUpdate = () => {
     if (!selectedMessage) return;
 
-    fetch("http://197.232.170.121:8594/api/registrations/UpdateMessages", {
+    fetch(`${import.meta.env.VITE_BASE_URL}/UpdateMessages`/*"http://197.232.170.121:8594/api/registrations/UpdateMessages"*/, { 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         Id: selectedMessage.id,
-        Message: selectedMessage.messages,
-        MessageType: selectedMessage.messageType,
+        Messages: selectedMessage.messages,
+        MessagesType: selectedMessage.messageType,
       }),
     })
       .then((response) => response.json())
       .then((data) => {
-        data.status = "57"? 
+        data.statusDescription = "success"? 
+        Swal.fire({
+          icon: "success",
+          title: data.statusDescription,
+          text: "Message updated successfully!",
+        })
+        :
         Swal.fire({
           icon: "error",
           title: data.statusDescription,
           text: "Failed to update message.",
         })
-        :
-        Swal.fire({
-          icon: "success",
-          title: data.statusDescription,
-          text: "Message updated successfully!",
-        });
+        
+        
         setShowModal(false);
         console.log(data)
+        setTableRefresh(!tableRefresh);
       })
       .catch((error) => {
         Swal.fire({
@@ -315,7 +321,7 @@ const Messages = () => {
           </CCardTitle>
 
           {/* Filter Dropdown */}
-          <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="d-flex justify-content-between align-items-center mt-3 mb-3">
             <div>
               <label style={{ marginRight: "10px" }}>Filter by MessageType:</label>
               <select
@@ -323,11 +329,10 @@ const Messages = () => {
                 value={messageType}
                 onChange={(e) => setMessageType(e.target.value)}
               >
-                <option value="SpecialService">Special Service</option>
-                <option value="holycommunion">Holy Communion</option>
-                <option value="firstservice">First Service</option>
-                <option value="Secondservice">Second Service</option>
-                <option value="Congrats">Congrats</option>
+                <option value="Special Service">Special Service</option>
+                <option value="Holy Communion">Holy Communion</option>
+                <option value="First Service">First Service</option>
+                <option value="Second Service">Second Service</option>
               </select>
             </div>
             <div>
@@ -406,11 +411,10 @@ const Messages = () => {
                   setSelectedMessage({ ...selectedMessage, messageType: e.target.value })
                 }
               >
-                <option value="SpecialService">Special Service</option>
-                <option value="holycommunion">Holy Communion</option>
-                <option value="firstservice">First Service</option>
-                <option value="Secondservice">Second Service</option>
-                <option value="Congrats">Congrats</option>
+                <option value="Special Service">Special Service</option>
+                <option value="Holy Communion">Holy Communion</option>
+                <option value="First Service">First Service</option>
+                <option value="Second Service">Second Service</option>
               </CFormSelect>
             </CModalBody>
             <CModalFooter>

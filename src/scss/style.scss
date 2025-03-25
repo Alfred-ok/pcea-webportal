@@ -19,3 +19,23 @@
     color: white !important;
     background-color: blue !important;
   }
+
+
+
+  .custom-datepicker {
+    width: 250px;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    background-color: #ffffff;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .custom-datepicker:hover, .custom-datepicker:focus {
+    border-color: #007bff;
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+  }
+  

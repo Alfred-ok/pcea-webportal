@@ -19,9 +19,16 @@ import {
     CForm,
     CModalFooter,
     CFormTextarea,
-    CFormSelect
+    CFormSelect,
+    CDropdownItem,
+    CDropdownMenu,
+    CDropdownToggle,
+    CDropdown
   } from '@coreui/react';
   import Swal from 'sweetalert2';
+  import { useSchedule } from "../../ScheduleContext"
+import { useNavigate } from "react-router-dom";
+
 
 function Marriage({Marriagestatus}) {
     const [data, setData] = useState([]);
@@ -32,12 +39,16 @@ function Marriage({Marriagestatus}) {
     const [comments, setComments] = useState("");
     const [approvalMemberId, setApprovalMemberId] = useState();
     const [zp, setZp] =useState();
+    const [tableRefresh, setTableRefresh ] = useState(true);
+    const { setSelectedAppointments, selectedAppointments } = useSchedule(); // Use context
+
+    const navigate = useNavigate();
 
 
     useEffect(() => {
         const fetchData = async () => {
           try {
-            const response = await fetch('http://197.232.170.121:8594/api/registrations/getservicerequestType?ServiceType=MarriageService');
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/getservicerequestTypeandstatus?ServiceType=marriagerequest&Status=1`/*'http://197.232.170.121:8594/api/registrations/getservicerequestTypeandstatus?ServiceType=marriagerequest&Status=1'*/);
             if (!response.ok) {
               throw new Error('Network response was not ok');
             }
@@ -50,7 +61,10 @@ function Marriage({Marriagestatus}) {
           }
         };
         fetchData();
-      }, []);
+      }, [tableRefresh]);
+
+
+      console.log(data);
     
     /*
       const handleapproval = async() =>{
@@ -102,7 +116,7 @@ const handleapproval = async (e) => {
   };
 
   try {
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/servicerequestupdate", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/servicerequestupdate`/*"http://197.232.170.121:8594/api/registrations/servicerequestupdate"*/, {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
@@ -121,6 +135,7 @@ const handleapproval = async (e) => {
       });
 
       setVisible(false); // Close modal
+      setTableRefresh(!tableRefresh)
   } catch (error) {
       console.error("Error updating status:", error);
       Swal.fire({
@@ -137,6 +152,9 @@ const handleapproval = async (e) => {
     const filteredData = data.filter(item => item.status == Marriagestatus)
 
 
+    console.log(selectedAppointments);
+
+
   return (
     <div>
         <CCard className='mt-4'>
@@ -147,7 +165,7 @@ const handleapproval = async (e) => {
             {loading && <CSpinner color="primary" />} 
             {error && <CAlert color="danger">{error}</CAlert>} 
             {!loading && !error && (
-              <CTable bordered stripedColumns hover responsive small>
+              <CTable bordered stripedColumns hover small>
                 <CTableHead>
                   <CTableRow color='primary'>
                     <CTableHeaderCell>ID</CTableHeaderCell>
@@ -157,9 +175,11 @@ const handleapproval = async (e) => {
                     <CTableHeaderCell>Marital Status</CTableHeaderCell>
                     <CTableHeaderCell>Mobile Number</CTableHeaderCell>
                     <CTableHeaderCell>Elder Name</CTableHeaderCell>
-                    <CTableHeaderCell>Elder Comments</CTableHeaderCell>
+                    {/*<CTableHeaderCell>Elder Comments</CTableHeaderCell>*/}
                     <CTableHeaderCell>ZP Number</CTableHeaderCell>
-                    <CTableHeaderCell>Status</CTableHeaderCell>
+                    {
+                    //<CTableHeaderCell>Status</CTableHeaderCell>
+                    }
                     <CTableHeaderCell>Action</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -173,19 +193,27 @@ const handleapproval = async (e) => {
                       <CTableDataCell>{item.maritalStatus}</CTableDataCell>
                       <CTableDataCell>{item.mobileNumber}</CTableDataCell>
                       <CTableDataCell>{item.elderName}</CTableDataCell>
-                      <CTableDataCell>{item.elderComments || 'N/A'}</CTableDataCell>
+                      {/*<CTableDataCell>{item.elderComments || 'N/A'}</CTableDataCell>*/}
                       <CTableDataCell>{item.zpnumber}</CTableDataCell>
-                      <CTableDataCell>{item.status}</CTableDataCell>
-                      <CTableDataCell>
-                      { item.status == "0" ?
-                        <CButton color="success" style={{color:"#fff"}} onClick={() => {setVisible(!visible); setApprovalMemberId(item.id); setZp(item.zpnumber)}}>
-                          Approve
-                        </CButton>
-                        :
-                        <CButton disabled color="primary" style={{color:"#fff"}} onClick={() => {setVisible(!visible); setApprovalMemberId(item.id); setZp(item.zpnumber)}}>
-                          Acccepted
-                        </CButton>
-                      }
+                      {
+                    //  <CTableDataCell>{item.status}</CTableDataCell>
+                  }
+                      <CTableDataCell style={{display:"flex", alignItems:"center", justifyContent:"center"}}>
+                      <CDropdown>
+                        <CDropdownToggle color="primary">Action</CDropdownToggle>
+                        <CDropdownMenu>
+                          <CDropdownItem>
+                              <CButton color="success" style={{color:"#fff", marginRight:"3px"}} onClick={() => {setVisible(!visible); setApprovalMemberId(item.id); setZp(item.zpnumber)}}>
+                              Approve
+                            </CButton>
+                          </CDropdownItem>
+                          <CDropdownItem>
+                            <CButton color="primary" onClick={()=>{setSelectedAppointments(item); navigate("/ScheduleMeeting")}}>Schedule meeting</CButton>
+                          </CDropdownItem>
+                          
+                        </CDropdownMenu>
+                      </CDropdown>
+            
                       </CTableDataCell>
                       
                     </CTableRow>
@@ -202,7 +230,7 @@ const handleapproval = async (e) => {
         aria-labelledby="LiveDemoExampleLabel"
       >
         <CModalHeader>
-          <CModalTitle id="LiveDemoExampleLabel">Approve Registration:</CModalTitle>
+          <CModalTitle id="LiveDemoExampleLabel">Approve Request</CModalTitle>
         </CModalHeader>
         <CModalBody>
           <CForm onSubmit={handleapproval}>
@@ -214,8 +242,10 @@ const handleapproval = async (e) => {
             onChange={(e) => setStatus(e.target.value)}
           >
             <option value="">Select</option>
-            <option value="1">Yes</option>
-            <option value="0">No</option>
+            <option value="2">Yes</option>
+            {
+            //<option value="0">No</option>
+            }
           </CFormSelect>
 
           <CFormTextarea

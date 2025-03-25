@@ -21,6 +21,8 @@ import CIcon from "@coreui/icons-react";
 import { cilLockLocked, cilUser } from "@coreui/icons";
 import logo1 from "src/assets/images/logo1.png";
 import { lineSpinner } from "ldrs";
+const ParticlesBackground = React.lazy(()=>import('../../ParticlesBackground'))
+
 lineSpinner.register();
 
 const Login = () => {
@@ -38,8 +40,10 @@ const Login = () => {
     setError(null);
     setLoading(true);
   
+    console.log(`${import.meta.env.VITE_FOUR_BASE_URL}/auth/login`);
+
     try {
-      const response = await fetch("http://197.232.170.121:8598/auth/login", {
+      const response = await fetch(`${import.meta.env.VITE_FOUR_BASE_URL}/auth/login`/*"http://197.232.170.121:8598/auth/login"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +90,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://197.232.170.121:8598/auth/changepin", {
+      const response = await fetch(`${import.meta.env.VITE_FOUR_BASE_URL}/auth/changepin`/*"http://197.232.170.121:8598/auth/changepin"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -116,14 +120,15 @@ const Login = () => {
   };
 
   return (
+    <ParticlesBackground>
     <div
       className="min-vh-100 d-flex flex-row align-items-center"
-      style={{
-        backgroundImage: "url('src/assets/images/1.jpg')",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundBlendMode: "multiply",
-      }}
+      //style={{
+       // backgroundImage: "url('src/assets/images/1.jpg')",
+       // backgroundRepeat: "no-repeat",
+       // backgroundSize: "cover",
+       // backgroundBlendMode: "multiply",
+      //}}
     >
       <CContainer>
         <CRow className="justify-content-center">
@@ -222,6 +227,7 @@ const Login = () => {
         </CModalFooter>
       </CModal>
     </div>
+    </ParticlesBackground>
   );
 };
 

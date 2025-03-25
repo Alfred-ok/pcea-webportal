@@ -37,7 +37,7 @@ function Baptism({ ChangeStatus }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://197.232.170.121:8594/api/registrations/getservicerequestType?ServiceType=BaptismRequest');
+                const response = await fetch(`${import.meta.env.VITE_BASE_URL}/getservicerequestType?ServiceType=BaptismRequest`/*'http://197.232.170.121:8594/api/registrations/getservicerequestType?ServiceType=BaptismRequest'*/);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -64,7 +64,7 @@ function Baptism({ ChangeStatus }) {
         };
 
         try {
-            const response = await fetch("http://197.232.170.121:8594/api/registrations/servicerequestupdate", {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/servicerequestupdate`/*"http://197.232.170.121:8594/api/registrations/servicerequestupdate"*/, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -123,7 +123,9 @@ function Baptism({ ChangeStatus }) {
                                     <CTableHeaderCell>Elder Name</CTableHeaderCell>
                                     <CTableHeaderCell>Elder Comments</CTableHeaderCell>
                                     <CTableHeaderCell>ZP Number</CTableHeaderCell>
-                                    <CTableHeaderCell>Status</CTableHeaderCell>
+                                    {
+                                    //<CTableHeaderCell>Status</CTableHeaderCell>
+                                    }
                                     <CTableHeaderCell>Action</CTableHeaderCell>
                                 </CTableRow>
                             </CTableHead>
@@ -139,7 +141,9 @@ function Baptism({ ChangeStatus }) {
                                         <CTableDataCell>{item.elderName}</CTableDataCell>
                                         <CTableDataCell>{item.elderComments || 'N/A'}</CTableDataCell>
                                         <CTableDataCell>{item.zpnumber}</CTableDataCell>
-                                        <CTableDataCell>{item.status}</CTableDataCell>
+                                        {
+                                        //<CTableDataCell>{item.status}</CTableDataCell>
+                                        }
                                         <CTableDataCell>
                                             <CButton color="success" style={{ color: "#fff" }} onClick={() => { setVisible(true); setApprovalMemberId(item.id); setZp(item.zpnumber) }}>
                                                 Approve
@@ -155,24 +159,11 @@ function Baptism({ ChangeStatus }) {
 
             <CModal visible={visible} onClose={() => setVisible(false)} aria-labelledby="LiveDemoExampleLabel">
                 <CModalHeader>
-                    <CModalTitle id="LiveDemoExampleLabel">Approve Registration:</CModalTitle>
+                    <CModalTitle id="LiveDemoExampleLabel">Approve Request</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
                     <CForm onSubmit={handleApproval}>
-                    { ChangeStatus == 0 ?
-                        <CFormSelect
-                            id="registrationStatus"
-                            className="form-control mt-2 mb-2"
-                            label="Status"
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        >
-                            <option value="">Select</option>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option> 
-                        </CFormSelect>
-                        :
-                        ChangeStatus == 1 ?
+                    { ChangeStatus == 1 ?
                         <CFormSelect
                             id="registrationStatus"
                             className="form-control mt-2 mb-2"
@@ -185,6 +176,7 @@ function Baptism({ ChangeStatus }) {
                             <option value="0">No</option> 
                         </CFormSelect>
                         :
+                        ChangeStatus == 2 ?
                         <CFormSelect
                             id="registrationStatus"
                             className="form-control mt-2 mb-2"
@@ -194,6 +186,18 @@ function Baptism({ ChangeStatus }) {
                         >
                             <option value="">Select</option>
                             <option value="3">Yes</option>
+                            <option value="0">No</option> 
+                        </CFormSelect>
+                        :
+                        <CFormSelect
+                            id="registrationStatus"
+                            className="form-control mt-2 mb-2"
+                            label="Status"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            <option value="">Select</option>
+                            <option value="4">Yes</option>
                             <option value="0">No</option> 
                         </CFormSelect>
                     } 

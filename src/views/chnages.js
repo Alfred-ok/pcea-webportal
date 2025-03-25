@@ -77,7 +77,10 @@ import * as XLSX from "xlsx";
       }
 
       setLoading(true);
-      fetch("http://197.232.170.121:8596/reports/all?type=Service", {
+      fetch(
+        //"http://197.232.170.121:8596/reports/all?type=Service"
+        `${VITE_THIRD_BASE_URL}/reports/all?type=Service`,
+        {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -107,8 +110,8 @@ import * as XLSX from "xlsx";
         console.error("No token found in local storage.");
         return;
       }
-
-      let url = " http://197.232.170.121:8596/reports/all?type=Communion";
+      
+      let url = `${import.meta.env.VITE_THIRD_BASE_URL}/reports/all?type=Communion` //" http://197.232.170.121:8596/reports/all?type=Communion";
       if (startDate && endDate) {
         url += `&start=${startDate}&end=${endDate}`;
       }

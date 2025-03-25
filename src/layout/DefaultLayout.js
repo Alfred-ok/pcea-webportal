@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index';
 import { Navigate } from 'react-router-dom';
+import bgImg from '../assets/images/Geometric-2.jpg'
 
 const DefaultLayout = () => {
   const token = localStorage.getItem('token'); // Check for token
@@ -13,7 +14,8 @@ const DefaultLayout = () => {
   return (
     <div
       style={{
-        backgroundImage: "url('src/assets/images/Geometric-2.jpg')",
+        backgroundImage: `url(${bgImg})`,
+       // backgroundImage: bgImg/*"url('src/assets/images/Geometric-2.jpg')"*/,
         backgroundRepeat: 'repeat',
         position: 'relative',
         color: 'black',

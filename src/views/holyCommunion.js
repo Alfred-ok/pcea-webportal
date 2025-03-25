@@ -54,7 +54,7 @@ function holyCommunion() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
 
-        const response = await fetch("http://197.232.170.121:8594/api/registrations/holyCommunion", {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/holyCommunion`/*"http://197.232.170.121:8594/api/registrations/holyCommunion"*/, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -142,7 +142,7 @@ function holyCommunion() {
         comments,
       };
   
-      const response = await fetch("http://197.232.170.121:8594/api/registrations/approvetransfer", {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/approvetransfer`/*"http://197.232.170.121:8594/api/registrations/approvetransfer"*/, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -287,7 +287,9 @@ function holyCommunion() {
           {/*<p style={{fontWeight:"bold"}} >{selectedMember?.id}</p>*/}
           <CFormSelect label="Status" className="mb-3" value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="7">Yes</option>
-            <option value="1">No</option>
+            {
+            //<option value="1">No</option>
+            }
           </CFormSelect>
           <CFormTextarea label="comments" className="mb-3" value={comments} onChange={(e) => setComments(e.target.value)} placeholder="Enter comments" />
         </CModalBody>
