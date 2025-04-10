@@ -42,9 +42,18 @@ export default defineConfig(() => {
     server: {
       port: 3000,
       proxy: {
+        /*
         // https://vitejs.dev/config/server-options.html
         target: '*',
         changeOrigin: true,
+        */
+        
+        '*': {
+          target: 'http://192.168.12.245', // Replace with actual backend URL
+          changeOrigin: true,
+          secure: false,
+          ws: true, // WebSocket support if needed
+        },
       },
     },
   }

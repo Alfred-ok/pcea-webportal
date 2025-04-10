@@ -103,6 +103,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import CIcon from "@coreui/icons-react";
 import { cilArrowThickRight } from "@coreui/icons";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { CButton } from "@coreui/react";
 
 const SummaryReports = () => {
   const [serviceData, setServiceData] = useState([]);
@@ -292,8 +295,48 @@ const filterDataBySingleDate = (data) => {
 
   const serviceStats = calculateStatistics(filteredServiceData);
   const communionStats = calculateStatistics(filteredCommunionData);
+
+
+
+
+
+  const handleDownloadExcel = () => {
+    const rows = [
+      ["Category", "Service", "Communion", "Total"],
+      ["Total Attendees", serviceStats.totalAttendees, communionStats.totalAttendees, serviceStats.totalAttendees + communionStats.totalAttendees],
+      ["Male Attendees", serviceStats.maleAttendees, communionStats.maleAttendees, serviceStats.maleAttendees + communionStats.maleAttendees],
+      ["Female Attendees", serviceStats.femaleAttendees, communionStats.femaleAttendees, serviceStats.femaleAttendees + communionStats.femaleAttendees],
+      ["Ages 12-18", serviceStats.ageGroup12_18, communionStats.ageGroup12_18, serviceStats.ageGroup12_18 + communionStats.ageGroup12_18],
+      ["Ages 19-34", serviceStats.ageGroup19_34, communionStats.ageGroup19_34, serviceStats.ageGroup19_34 + communionStats.ageGroup19_34],
+      ["Ages 35+", serviceStats.ageGroup35Above, communionStats.ageGroup35Above, serviceStats.ageGroup35Above + communionStats.ageGroup35Above],
+      ["First Service", serviceStats.services["First Service"] || 0, communionStats.services["First Service"] || 0, (serviceStats.services["First Service"] || 0) + (communionStats.services["First Service"] || 0)],
+      ["Second Service", serviceStats.services["Second Service"] || 0, communionStats.services["Second Service"] || 0, (serviceStats.services["Second Service"] || 0) + (communionStats.services["Second Service"] || 0)],
+      ["Mid-Week Service", serviceStats.services["Mid-Week Service"] || 0, communionStats.services["Mid-Week Service"] || 0, (serviceStats.services["Mid-Week Service"] || 0) + (communionStats.services["Mid-Week Service"] || 0)],
+      ["Youth Service", serviceStats.services["Youth Service"] || 0, communionStats.services["Youth Service"] || 0, (serviceStats.services["Youth Service"] || 0) + (communionStats.services["Youth Service"] || 0)],
+      ["Special Service", serviceStats.services["Special Service"] || 0, communionStats.services["Special Service"] || 0, (serviceStats.services["Special Service"] || 0) + (communionStats.services["Special Service"] || 0)],
+    ];
+  
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Summary");
+  
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "AttendanceSummary.xlsx");
+  };
+  
+
+
+
+
+
+
+
   
   console.log(serviceStats.services)
+
+
+
 
 
 
@@ -366,6 +409,12 @@ const filterDataBySingleDate = (data) => {
   </CCol>
   </CRow>
 </div>
+<div style={{ textAlign: "right", margin: "10px 20px" }}>
+  <CButton color="success" onClick={handleDownloadExcel}>
+    Download Excel
+  </CButton>
+</div>
+
 
 
 

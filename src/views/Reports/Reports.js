@@ -555,6 +555,9 @@ export default Reports;
 
 */
 
+
+
+
 import React from 'react'
 import { CAlert, CCard, CCardHeader, CTab, CTabContent, CTabList, CTabPanel, CTabs } from '@coreui/react'
 
@@ -563,6 +566,8 @@ import { CAlert, CCard, CCardHeader, CTab, CTabContent, CTabList, CTabPanel, CTa
 import SummaryReports from './SummaryReports'
 //import OverallReports from './OverallReports'
 import CommAndService from './CommAndService'
+import HolyCommunionReport from './HolycommunionReports'
+import ServiceReport from './ServiceReports'
 
 function Reports() {
   return (
@@ -572,14 +577,18 @@ function Reports() {
         <h3 style={{ color: "#fff" }}>Reports</h3>
     </CAlert>
     
-    <CTabs activeItemKey="ServiceReports">
+    <CTabs activeItemKey="HolyCommunionReports">
       <CTabList variant="tabs">
-        <CTab itemKey="ServiceReports">Holy Communion and Service Reports</CTab>
+        <CTab itemKey="HolyCommunionReports">Holy Communion Reports</CTab>
+        <CTab itemKey="ServiceReports">Service Reports</CTab>
         <CTab itemKey="SummaryReports">Summary Reports</CTab>
       </CTabList>
       <CTabContent>
+        <CTabPanel className="p-3" itemKey="HolyCommunionReports" style={{backgroundColor:"#fff"}}>
+          <HolyCommunionReport/>
+        </CTabPanel>
         <CTabPanel className="p-3" itemKey="ServiceReports" style={{backgroundColor:"#fff"}}>
-          <CommAndService/>
+          <ServiceReport/>
         </CTabPanel>
         <CTabPanel className="p-3" itemKey="SummaryReports" style={{backgroundColor:"#fff"}}>
           <SummaryReports/>

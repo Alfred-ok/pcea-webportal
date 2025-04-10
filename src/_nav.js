@@ -37,6 +37,8 @@ const _nav = [
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Messages</span>, to: "/messages", icon: <MdReceiptLong className="nav-icon" /> ,roleId : "1"},//Admin
  
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Readmission</span>, to: "/Readmission", icon: <MdGroupAdd className="nav-icon" /> ,roleId : "3"},//evangelist
+
+  { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Pending Approval</span>, to: "/PendingApproval", icon: <MdReceiptLong className="nav-icon" />, roleId : "3" },
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>New Applicant</span>, to: "/members", icon: <MdGroupAdd className="nav-icon" /> ,roleId : "3"},//evangelist
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Member Status</span>, to: "/status", icon: <MdCorporateFare className="nav-icon" />, role:"AdminRole", roleId : "2",roleId : "3" },
 
@@ -62,6 +64,7 @@ const _nav = [
 
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Member Information</span>, to: "/MemberInformation", icon: <MdReceiptLong className="nav-icon" />, role:"AdminRole" },
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Add Member</span>, to: "/AddMember", icon: <MdReceiptLong className="nav-icon" />, roleId : "1" },
+  { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Add Member</span>, to: "/AddMember", icon: <MdReceiptLong className="nav-icon" />, roleId : "3" },
 
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Officiating Minister</span>, to: "/Minister", icon: <MdReceiptLong className="nav-icon" />, roleId : "2" },
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Appointments</span>, to: "/Appointments", icon: <MdReceiptLong className="nav-icon" />, roleId : "2" },
@@ -71,7 +74,13 @@ const _nav = [
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>CardNumber Update</span>, to: "/CardNumberUpdate", icon: <MdReceiptLong className="nav-icon" />, roleId : "1" },
 
   { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>Appointment</span>, to: "/EvangelistAppointment", icon: <MdReceiptLong className="nav-icon" />, roleId : "3" },
+
+  { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>All Member</span>, to: "/Allmember", icon: <MdReceiptLong className="nav-icon" />, roleId : "3" },
+  { component: CNavItem, name: <span style={{ fontWeight: "bold", fontSize: "18px" }}>All Member</span>, to: "/Allmember", icon: <MdReceiptLong className="nav-icon" />, roleId : "1" },
+
   
+  
+
   
 ];
 

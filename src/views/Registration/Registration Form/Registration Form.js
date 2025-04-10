@@ -25,6 +25,7 @@ const RegistrationForm = () => {
   const [filteredDistricts, setFilteredDistricts] = useState([]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedZone, setSelectedZone] = useState("");
+  const [spouseZP, setSpouseZp] = useState("");
 
   const [loadingButton, setLoadingButton] = useState(false);
 
@@ -176,18 +177,18 @@ useEffect(() => {
     
 
 
+  useEffect(()=>{
+    setFormData((prev) => ({
+      ...prev,
+      spouseZP: spouseZP,
+    }));
+  },[spouseZP])
+  
 
 
 
+  console.log(formData )
 
-
-
-
-  console.log(selectedZone);
-  console.log(formData.district);
-
-  console.log(selectedDistrict);
-  console.log(selectedZone);
 
 
   const handleChange = ({ target: { name, value, type, checked } }) => {
@@ -409,7 +410,17 @@ useEffect(() => {
       
       {renderFormInput("Spouse Name", "spouseName")}
 
-      {renderFormInput("Spouse ZP", "spouseZP")}
+      <CCol md="6">
+            <CFormLabel style={{ fontWeight: "bold", color: "blue" }}>Spouse Zp</CFormLabel>
+            <CFormInput
+              type="text"
+              value={spouseZP}
+              onChange={(e)=>setSpouseZp(e.target.value)}
+              placeholder="spouse zp"
+            />
+      </CCol>
+
+      {/*renderFormInput("Spouse ZP", "spouseZP")*/}
     </>
   )}
   

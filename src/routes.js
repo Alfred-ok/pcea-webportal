@@ -2,6 +2,7 @@ import { element } from "prop-types";
 import React from "react";
 import newMembers from "./views/newMembers";
 
+
 const Dashboard = React.lazy(() => import("./views/dashboard/Dashboard"));
 const Colors = React.lazy(() => import("./views/theme/colors/Colors"));
 const Typography = React.lazy(
@@ -170,6 +171,10 @@ const Appointments = React.lazy(()=>import("./views/Appointments"))
 
 const EvangelistAppointment = React.lazy(()=>import("./views/EvangelistAppointment/EvangelistAppointment"))
 
+const PendingApproval = React.lazy(()=>import("./views/PendingApproval"))
+
+const Allmember = React.lazy(()=>import("./views/Allmember/index"))
+
 const routes = [
   { path: "/", exact: true, name: "Home" },
   { path: "/dashboard", name: "Dashboard", element: Dashboard },
@@ -230,6 +235,10 @@ const routes = [
   {path:"/ScheduleMeeting",name:"ScheduleMeeting", element: ScheduleMeeting}, 
 
   {path: "/EvangelistAppointment", name: "EvangelistAppointment", element: EvangelistAppointment },
+
+  {path: "/PendingApproval", name: "PendingApproval", element: PendingApproval },
+
+  {path: "/Allmember", name:"Allmember", element: Allmember },
 
   { path: "/theme", name: "Theme", element: Colors, exact: true },
   { path: "/theme/colors", name: "Colors", element: Colors },

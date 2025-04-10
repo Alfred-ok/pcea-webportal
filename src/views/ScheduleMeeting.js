@@ -554,7 +554,7 @@ const ScheduleMeeting = () => {
             if(selectedAppointments.notes){
             setReason(`From ${selectedAppointments.appointmentType} by ${selectedAppointments.ministerName}. Reason for application is ${selectedAppointments.notes}.`);
             }else if(selectedAppointments.name){
-                setReason(`A ${selectedAppointments.reasonForApplication} booking has been made on for ${selectedAppointments.name}. For further details, please contact them at ${selectedAppointments.mobileNumber}.`);
+                setReason(`A ${selectedAppointments.reasonForApplication} appointment has been scheduled for ${selectedAppointments.name}. The member's contact number is +254${selectedAppointments.mobileNumber}.`);
             }else{
                 setReason("")
             }
@@ -580,9 +580,9 @@ const ScheduleMeeting = () => {
             const formattedEvents = data.map(event => ({
                 id: event.id,
                 title: event.reason,
-                start: moment(event.date).toDate(),
-                end: moment(event.date).toDate(), // AllDays
-                allDay: true // Marks it as an all-day event
+                start: moment(event.date).toDate(), // Includes time
+                end: moment(event.date).add(1, "hour").toDate(), // Adjust duration if needed
+                allDay: false // Allow specific time
             }));
             setEvents(formattedEvents);
            
@@ -598,12 +598,24 @@ const ScheduleMeeting = () => {
     const handleSelectSlot = (slotInfo) =>{
         setVisible(!visible);
         setDate(slotInfo.start)
+        setReason("")
     }
+
+   
 
     const handleCreate = async () => {
         setLoading(true);
         setError(null);
-        const newSchedule = { Date: moment(date).format("YYYY-MM-DD"), Name: "Reason", Reason: reason };
+
+
+
+        // Combine date and time into a single formatted string
+        //const formattedDateTime = moment(date).format("YYYY-MM-DD HH:mm");
+
+        const newSchedule = { Date: /*formattedDateTime*/ moment(date).format("YYYY-MM-DD"), Name: "Reason", Reason: reason };
+    
+        console.log(newSchedule);
+
         try {
             const response = await fetch(`${import.meta.env.VITE_BASE_URL}/CreateSchedule`/*"http://197.232.170.121:8594/api/registrations/CreateSchedule"*/, {
                 method: "POST",
@@ -651,6 +663,8 @@ const ScheduleMeeting = () => {
         setDeleteModal(true);
     };
 
+    console.log(date);
+
 
     return (
         <CCard className="shadow-lg">
@@ -669,7 +683,7 @@ const ScheduleMeeting = () => {
                 </CModalHeader>
 
                 <CModalBody>
-                    <CFormInput type="text" placeholder="Reason" value={reason} onChange={(e) => setReason(e.target.value)} />
+                    <CFormTextarea placeholder="Reason"  rows={3} value={reason} onChange={(e) => setReason(e.target.value)} />
                     <CButton onClick={handleCreate} color="primary" className="m-2" disabled={loading}>{loading ? "Creating..." : "Create Schedule"}</CButton>
                 </CModalBody>
                 <CModalFooter>
@@ -727,10 +741,37 @@ const ScheduleMeeting = () => {
                         onChange={(e) => setReason(e.target.value)}
                         placeholder="Reason"
                     ></CFormTextarea>
+                    
                     <CFormLabel htmlFor="to">
                         Date
                     </CFormLabel>
-                    <CFormInput id="to" type="date" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date" />
+                    <CFormInput 
+                        id="to" 
+                        type="date" 
+                        //value={moment(date).format("YYYY-MM-DD")} 
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                       /* onChange={(e) => setDate(moment(date).set({
+                            year: moment(e.target.value).year(),
+                            month: moment(e.target.value).month(),
+                            date: moment(e.target.value).date()
+                        }).toDate())} */
+                        placeholder="Date" />
+                    {/*
+                    <CFormLabel htmlFor="time">
+                        Time
+                    </CFormLabel>
+                    <CFormInput 
+                        id="time" 
+                        type="time" 
+                        value={moment(date).format("HH:mm")} 
+                        onChange={(e) => setDate(moment(date).set({
+                            hour: moment(e.target.value, "HH:mm").hour(),
+                            minute: moment(e.target.value, "HH:mm").minute()
+                        }).toDate())} 
+                        placeholder="Time" 
+                    />
+                    */}
                     <CButton onClick={handleCreate} color="primary" className="mt-3" disabled={loading}>{loading ? "Creating..." : "Create Schedule"}</CButton>
                     
                 </CModalBody>
@@ -746,7 +787,7 @@ const ScheduleMeeting = () => {
                     startAccessor="start" 
                     endAccessor="end" 
                     allDayAccessor="allDay" 
-                    style={{ height: 400 }} 
+                    style={{ height: 800 }} 
                     selectable={true}
                     onSelectSlot={handleSelectSlot} 
                     onSelectEvent={handleSelectEvent}   

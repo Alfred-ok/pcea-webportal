@@ -24,6 +24,7 @@ import {
   CFormInput
 } from "@coreui/react";
 import * as XLSX from 'xlsx';
+import Districtdata from  "../Registration/Registration Form/Districtdata"
 
 const CommAndService = () => {
   const [activeTab, setActiveTab] = useState("serviceReport");
@@ -39,6 +40,25 @@ const CommAndService = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 100;
   const [service, setService] = useState();
+  const [tableRefresh, settableRefresh] = useState(false);
+
+
+  useEffect(()=>{
+    if(tableRefresh){
+      setFromDate("")
+      setToDate("")
+      setSelectedGender("All")
+    }
+    
+  
+  },[tableRefresh])
+
+  useEffect(()=>{
+    if(activeTab === "holyCommunionReport"){
+      settableRefresh(!tableRefresh);
+    }
+  },[activeTab])
+  
 
   useEffect(() => {
     const fetchData = async (url, setData) => {
@@ -88,12 +108,15 @@ const CommAndService = () => {
     };
 
     if (activeTab === "serviceReport") {
+      settableRefresh(!tableRefresh)
       fetchData(`${import.meta.env.VITE_THIRD_BASE_URL}/reports/all?type=Service`/*"http://197.232.170.121:8596/reports/all?type=Service"*/, setServiceData);
     } else if (activeTab === "holyCommunionReport") {
+      
       fetchData(`${import.meta.env.VITE_THIRD_BASE_URL}/reports/all?type=Communion`/*"http://197.232.170.121:8596/reports/all?type=Communion"*/, setCommunionData);
     }
   }, [activeTab]);
 
+  
 
 
 
@@ -168,7 +191,7 @@ const CommAndService = () => {
     }
     setFilteredData(filtered);
     setCurrentPage(1);
-  }, [selectedDistrict, selectedGender, selectedAgeGroup,service,fromDate, toDate, serviceData, communionData, activeTab]);
+  }, [selectedDistrict, selectedGender, selectedAgeGroup,service,fromDate, toDate, serviceData, communionData, activeTab, tableRefresh]);
 
   const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -202,7 +225,7 @@ const CommAndService = () => {
           </CFormLabel>
           <CFormSelect value={selectedDistrict} onChange={(e) => setSelectedDistrict(e.target.value)}>
             <option value="All">All Districts</option>
-            {districts.map((district, index) => <option key={index} value={district}>{district}</option>)}
+            { Districtdata.map((data, index) => <option key={index} value={data.district}>{data.district}</option>)}
           </CFormSelect>
         </CCol>
         <CCol>
